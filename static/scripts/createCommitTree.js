@@ -7,7 +7,7 @@
 
 
 function createCommitTree(repo, owner) {
-  $.get("https://api.github.com/repos/" + owner + "/" + repo + "/commits").done(processCommits);
+  $.get("https://api.github.com/repos/" + owner + "/" + repo + "/commits?since=1995-01-01T01:01:00Z").done(processCommits);
 }
 
 // Takes a list of commits and returns a head node.
@@ -18,7 +18,7 @@ function processCommits(commits) {
     sha_to_node[commits[i].sha] = newNode(commits[i]);
   }
   // Create tree of nodes
-  var head = null;
+  var heads = [];
   for (i in sha_to_node) {
     var parents = sha_to_node[i].commit.parents;
     if (parents.length > 0) {
@@ -26,15 +26,20 @@ function processCommits(commits) {
         if (sha_to_node[parents[j].sha]) {
           sha_to_node[parents[j].sha].children.push(sha_to_node[i]);
         } else {
-          head = sha_to_node[i];
+          heads.push(sha_to_node[i]);
         }
       }
     } else {
-      head = sha_to_node[i];
+      heads.push(sha_to_node[i]);
     }
   }
-  computeLevels(head, 1);
-  renderNodes(head, sha_to_node);
+  for (i in heads) {
+    computeLevels(heads[i], 1);
+  }
+  for (i in heads) {
+    computeLevels(heads[i], 1);
+  }
+  renderNodes(heads, sha_to_node);
 }
 
 function computeLevels(node, start) {
@@ -46,13 +51,14 @@ function computeLevels(node, start) {
   }
 }
 
-function renderNodes(head, sha_to_node) {
+function renderNodes(heads, sha_to_node) {
   var nodes_list = [];
   var edges_list = [];
   for (i in sha_to_node) {
-    nodes_list.push({id: i, label: i.slice(0,7), level: sha_to_node[i].level});
+    var node_color = getRandomColor();
+    nodes_list.push({id: i, label: i.slice(0,7), level: sha_to_node[i].level, color: {border: node_color,  highlight: node_color, background: node_color}});
     for (j in sha_to_node[i].children) {
-      edges_list.push({from: i, to: sha_to_node[i].children[j].commit.sha});
+      edges_list.push({from: i, to: sha_to_node[i].children[j].commit.sha, color: {color: node_color, highlight: node_color}});
     }
   }
   var nodes = new vis.DataSet(nodes_list);
@@ -68,15 +74,18 @@ function renderNodes(head, sha_to_node) {
       levelSeparation: 100,
       sortMethod: "directed"
     }},
-    autoResize: false,
+    autoResize: true,
     edges: {
-      smooth: false
+      smooth: true
     },
     physics:{
-      enabled: false
-    },
+      hierarchicalRepulsion: {}
+    }
   };
   var network = new vis.Network(container, data, options);
+  network.on("click", function(data){
+    console.log(data)
+  });
 }
 
 // Constructs a new node.
@@ -91,10 +100,10 @@ function newNode(commit) {
 }
 
 function getRandomColor() {
-  var letters = '0123456789ABCDEF'.split('');
+  var letters = '456789ABCDEF'.split('');
   var color = '#';
   for (var i = 0; i < 6; i++ ) {
-    color += letters[Math.floor(Math.random() * 16)];
+    color += letters[Math.floor(Math.random() * letters.length)];
   }
   return color;
 }
