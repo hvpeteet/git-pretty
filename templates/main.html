@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Git Pretty</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <link href="/static/scripts/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="/static/scripts/vis/dist/vis.js"></script>
+  <script src="/static/scripts/createCommitTree.js"></script>
+  <style type="text/css">
+    #graph {
+      width: 110vw;
+      height: 110vh;
+      margin-left: -5vw;
+      margin-right: -5vw;
+      margin-top: -5vh;
+      margin-bottom: -5vh;
+      overflow: hidden;
+    }
+    body {
+      overflow: hidden;
+    }
+  </style>
+  <script type="text/javascript">
+    createCommitTree("{{repo}}", "{{owner}}");
+  </script>
+</head>
+<body>
+  <div id="graph">
+  </div>
+</body>
+</html>
