@@ -84,7 +84,12 @@ function renderNodes(heads, sha_to_node) {
   };
   var network = new vis.Network(container, data, options);
   network.on("click", function(data){
-    console.log(data)
+    if (data.nodes.length == 0) {
+      return;
+    }
+    var node = sha_to_node[data.nodes[0]];
+    var inspector = document.getElementById("inspector");
+    inspector.innerHTML = node.commit.commit.message;
   });
 }
 
