@@ -79,7 +79,7 @@ function renderNodes(heads, sha_to_node) {
       smooth: true
     },
     physics:{
-      hierarchicalRepulsion: {}
+      hierarchicalRepulsion: {centralGravity: -1, springConstant: .5}
     }
   };
   var network = new vis.Network(container, data, options);
