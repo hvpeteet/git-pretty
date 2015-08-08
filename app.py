@@ -5,7 +5,14 @@ import os
 class GraphPage(webapp2.RequestHandler):
   def get(self):
     template = JINJA_ENVIRONMENT.get_template("templates/main.html")
-    template_vars = {"repo": self.request.get("repo"), "owner": self.request.get("owner")}
+    max_commits = self.request.get("max_commits")
+    if max_commits == "":
+      max_commits = "30"
+    template_vars = {
+      "repo": self.request.get("repo"), 
+      "owner": self.request.get("owner"), 
+      "max_commits": max_commits
+    }
     self.response.write(template.render(template_vars))
 
 class MainPage(webapp2.RequestHandler):

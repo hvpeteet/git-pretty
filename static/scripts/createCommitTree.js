@@ -5,14 +5,31 @@
 //   4) show useful info, 
 //   5) select 2 and diff
 
+var page_size = 30;
+var commits = [];
 
-function createCommitTree(repo, owner) {
-  $.get("https://api.github.com/repos/" + owner + "/" + repo + "/commits?since=1995-01-01T01:01:00Z").done(processCommits);
+function createCommitTree(repo, owner, page) {
+  var url = "https://api.github.com/repos/" + owner + "/" + repo + "/commits?since=2007-01-01T01:01:00Z&page=" + page;
+  console.log(url);
+  $.get(url)
+    .done(function(new_commits) {
+      commits = commits.concat(new_commits);
+      console.log(commits.length);
+      if (new_commits.length < page_size || commits.length > max_commits) {
+        if (commits.length > max_commits) {
+          commits = commits.slice(0, max_commits);
+        }
+        processCommits();
+      } else {
+        createCommitTree(repo, owner, page + 1);
+      }
+    });
 }
 
 // Takes a list of commits and returns a head node.
-function processCommits(commits) {
+function processCommits() {
   // Create map[sha1]node
+  console.log(commits);
   var sha_to_node = {};
   for (i in commits) {
     sha_to_node[commits[i].sha] = newNode(commits[i]);
@@ -33,9 +50,7 @@ function processCommits(commits) {
       heads.push(sha_to_node[i]);
     }
   }
-  for (i in heads) {
-    computeLevels(heads[i], 1);
-  }
+  console.log("computing levels");
   for (i in heads) {
     computeLevels(heads[i], 1);
   }
@@ -52,8 +67,10 @@ function computeLevels(node, start) {
 }
 
 function renderNodes(heads, sha_to_node) {
+  console.log("rendering nodes");
   var nodes_list = [];
   var edges_list = [];
+  console.log(Object.keys(sha_to_node).length);
   for (i in sha_to_node) {
     var node_color = getRandomColor();
     nodes_list.push({id: i, label: i.slice(0,7), level: sha_to_node[i].level, color: {border: node_color,  highlight: node_color, background: node_color}});
@@ -76,18 +93,20 @@ function renderNodes(heads, sha_to_node) {
     }},
     autoResize: true,
     edges: {
-      smooth: true
+      smooth: false
     },
     physics:{
-      hierarchicalRepulsion: {centralGravity: -1, springConstant: 1.0}
+      hierarchicalRepulsion: {centralGravity: -1, springConstant: 1.0, damping: 1}
     }
   };
+  console.log("handed rendering off to api");
   var network = new vis.Network(container, data, options);
   network.on("click", function(data){
     if (data.nodes.length == 0) {
       return;
     }
     var node = sha_to_node[data.nodes[0]];
+    console.log(node);
     var inspector = document.getElementById("inspector");
     inspector.innerHTML = node.commit.commit.message;
   });
