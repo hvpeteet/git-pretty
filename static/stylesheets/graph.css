@@ -1,0 +1,20 @@
+#graph {
+  width: 60vw;
+  height: 100vh;
+  margin-left: -5vw;
+  margin-top: -5vh;
+  margin-bottom: -5vh;
+  overflow: hidden;
+  float: left;
+}
+#inspector {
+  padding: 10px;
+  width: 40vw;
+  height: 97vh;
+  margin-right: -5vw;
+  background-color: #DDD;
+  float: left;
+}
+body {
+  overflow: hidden;
+}

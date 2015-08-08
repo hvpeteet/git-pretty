@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Git Pretty</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <link href="/static/scripts/vis/dist/vis.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="/static/scripts/vis/dist/vis.js"></script>
+  <script src="/static/scripts/createCommitTree.js"></script>
+  <link type="text/css" rel="stylesheet" href="/static/stylesheets/graph.css">
+  <script type="text/javascript">
+    var commits = {{commits}};
+    $(document).ready(processCommits);
+  </script>
+</head>
+<body>
+  <div id="graph">
+  </div>
+  <div id="inspector">
+    <div><strong> Commit Message </strong><span id="commit_message">Nothing Selected</span></div>
+    <br>
+    <div><strong> Committer </strong><span id="committer">Nothing Selected</span></div>
+    <br>
+    <div><strong> SHA1 Hash </strong><span id="commit_sha">Nothing Selected</span></div>
+
+  </div>
+</body>
+</html>

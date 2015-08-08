@@ -1,41 +1,20 @@
 // TODO(hvpeteet): 
-//   1) Multiple roots(too big to get real root), 
+//   1) Multiple roots(too big to get real root), [DONE]
 //   2) time window select, 
-//   3) show commit message, 
+//   3) show commit message, [DONE]
 //   4) show useful info, 
 //   5) select 2 and diff
 
-var page_size = 30;
-var commits = [];
+var sha_to_node = {};
 
-function createCommitTree(repo, owner, page) {
-  var url = "https://api.github.com/repos/" + owner + "/" + repo + "/commits?since=2007-01-01T01:01:00Z&page=" + page;
-  console.log(url);
-  $.get(url)
-    .done(function(new_commits) {
-      commits = commits.concat(new_commits);
-      console.log(commits.length);
-      if (new_commits.length < page_size || commits.length > max_commits) {
-        if (commits.length > max_commits) {
-          commits = commits.slice(0, max_commits);
-        }
-        processCommits();
-      } else {
-        createCommitTree(repo, owner, page + 1);
-      }
-    });
-}
-
-// Takes a list of commits and returns a head node.
+// Will process and then render the nodes held.
+// Assumes / inputs:
+//   This uses a gloabl list named commits that should have all commit objects contained in it.
 function processCommits() {
-  // Create map[sha1]node
-  console.log(commits);
-  var sha_to_node = {};
   for (i in commits) {
     sha_to_node[commits[i].sha] = newNode(commits[i]);
   }
-  // Create tree of nodes
-  var heads = [];
+  var heads = []; // Since we do not get the entire git history there may be multiple heads of this tree.
   for (i in sha_to_node) {
     var parents = sha_to_node[i].commit.parents;
     if (parents.length > 0) {
@@ -50,13 +29,15 @@ function processCommits() {
       heads.push(sha_to_node[i]);
     }
   }
-  console.log("computing levels");
   for (i in heads) {
     computeLevels(heads[i], 1);
   }
-  renderNodes(heads, sha_to_node);
+  console.log(heads);
+  renderNodes(heads);
 }
 
+// Will refresh the level field in a node and all of its child nodes to be equal to their depth in the tree.
+// Start is the level that the current node is at.
 function computeLevels(node, start) {
   node.level = start;
   for (i in node.children) {
@@ -66,14 +47,14 @@ function computeLevels(node, start) {
   }
 }
 
-function renderNodes(heads, sha_to_node) {
+// Takes a list of head nodes and renders them as well as their children.
+function renderNodes(heads) {
   console.log("rendering nodes");
   var nodes_list = [];
   var edges_list = [];
-  console.log(Object.keys(sha_to_node).length);
   for (i in sha_to_node) {
     var node_color = getRandomColor();
-    nodes_list.push({id: i, label: i.slice(0,7), level: sha_to_node[i].level, color: {border: node_color,  highlight: node_color, background: node_color}});
+    nodes_list.push({id: i, label: i.slice(0,7), level: sha_to_node[i].level, color: {border: node_color,  highlight: node_color, background: node_color, value: 1}});
     for (j in sha_to_node[i].children) {
       edges_list.push({from: i, to: sha_to_node[i].children[j].commit.sha, color: {color: node_color, highlight: node_color}});
     }
@@ -88,7 +69,7 @@ function renderNodes(heads, sha_to_node) {
   var options = {
     layout: {hierarchical: {
       enabled: true,
-      levelSeparation: 100,
+      levelSeparation: 80,
       sortMethod: "directed"
     }},
     autoResize: true,
@@ -96,20 +77,27 @@ function renderNodes(heads, sha_to_node) {
       smooth: false
     },
     physics:{
-      hierarchicalRepulsion: {centralGravity: -1, springConstant: 1.0, damping: 1}
+      hierarchicalRepulsion: {centralGravity: -1, springConstant: 1.0, damping: 1, nodeDistance: 120}
+    },
+    nodes: {
+      shape: "circle"
     }
   };
+  console.log(nodes_list);
   console.log("handed rendering off to api");
   var network = new vis.Network(container, data, options);
-  network.on("click", function(data){
-    if (data.nodes.length == 0) {
+  network.on("click", networkOnclick);
+}
+
+function networkOnclick(click_event) {
+    if (click_event.nodes.length == 0) {
       return;
     }
-    var node = sha_to_node[data.nodes[0]];
+    var node = sha_to_node[click_event.nodes[0]];
     console.log(node);
-    var inspector = document.getElementById("inspector");
-    inspector.innerHTML = node.commit.commit.message;
-  });
+    document.getElementById("commit_message").innerHTML = node.commit.commit.message;
+    document.getElementById("committer").innerHTML = node.commit.commit.committer.name;
+    document.getElementById("commit_sha").innerHTML = node.commit.sha;
 }
 
 // Constructs a new node.
@@ -131,3 +119,25 @@ function getRandomColor() {
   }
   return color;
 }
+
+
+// ===========================================
+// EXPERIMENTAL BELOW HERE
+// ===========================================
+
+// function getFullDiff(node_sha, other_sha, callback) {
+//   // TODO(hvpeteet)
+//   callback(null);
+// }
+
+// function getDiffNum(node_sha, other_sha, callback) {
+//   var url = baseURL + "/compare/" + other_sha + "..." + node_sha + "?" + auth_args;
+//   $.get(url).done(function(resp) {
+//     console.log(resp.commits.files);
+//     var diff = 0;
+//     for (i in resp.commits.files) {
+//       diff += resp.files[i].additions + resp.files[i].deletions;
+//     }
+//     callabck(diff);
+//   });
+// }
