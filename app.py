@@ -15,14 +15,21 @@ class GraphPage(webapp2.RequestHandler):
     max_commits = self.request.get("max_commits")
     repo = self.request.get("repo")
     owner = self.request.get("owner")
-    if max_commits == "":
-      max_commits = 30
-    else:
+    try:
       max_commits = int(max_commits)
-    commits = getCommits(repo, owner, max_commits)
-    template = JINJA_ENVIRONMENT.get_template("templates/graph.html")
-    template_vars = {"commits": json.dumps(commits[:max_commits])}
-    self.response.write(template.render(template_vars))
+    except ValueError:
+      self.response.write("max commits must be a valid base 10 number")
+      return
+    if max_commits > 1000:
+      self.response.write("max commits must be <= 1000")
+      return
+    try:
+      commits = getCommits(repo, owner, max_commits)
+      template = JINJA_ENVIRONMENT.get_template("templates/graph.html")
+      template_vars = {"commits": json.dumps(commits[:max_commits])}
+      self.response.write(template.render(template_vars))
+    except:
+      self.response.write("Invalid repository")
 
 
 def getCommits(repo, owner, max_commits):

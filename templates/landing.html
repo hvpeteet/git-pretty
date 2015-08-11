@@ -1,10 +1,61 @@
 <html>
+  <head>
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.indigo-blue.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+    <style type="text/css">
+      body {
+        background-color: #DDD;
+        /*background: url('some_image.jpg') center / cover;*/
+      }
+      .input_card{
+        top: 50%;
+        transform: translateY(-50%);
+        margin: auto;
+        padding: 30px;
+      }
+      .page-content {
+        height: 90%;
+      }
+    </style>
+  </head>
   <body>
-    <form action="/graph">
-      <input type="text" name="repo" placeholder=repo name></input>
-      <input type="text" name="owner" placeholder=owner></input>
-      <input type="text" name="max_commits" placeholder=max commits></input>
-      <button value="submit">Get Graph</button>
-    </form>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <!-- Title -->
+          <span class="mdl-layout-title">Git Pretty</span>
+          <!-- Add spacer, to align navigation to the right -->
+          <div class="mdl-layout-spacer"></div>
+          <!-- Navigation. We hide it in small screens. -->
+          <nav class="mdl-navigation mdl-layout--large-screen-only">
+            <a class="mdl-navigation__link" href="http://henrypeteet.com">by Henry Peteet</a>
+          </nav>
+        </div>
+      </header>
+      <main class="mdl-layout__content">
+        <div class="page-content">
+          <div class="mdl-card mdl-shadow--2dp input_card">
+            <form action="/graph">
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" name="repo" id="repo"/>
+                <label class="mdl-textfield__label" for="repo">Repo</label>
+              </div>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" name="owner" id="owner"/>
+                <label class="mdl-textfield__label" for="owner">Owner</label>
+              </div>
+              <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                <input class="mdl-textfield__input" type="text" name="max_commits" id="max_commits" pattern="[0-9]{1,3}"/>
+                <label class="mdl-textfield__label" for="max_commits">Max Commits</label>
+                <span class="mdl-textfield__error">Input must be a number less than 1000!</span>
+              </div>
+              <br>
+              <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent" value="submit">Get Graph</button>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
   </body>
 </html>
