@@ -26,7 +26,11 @@ class GraphPage(webapp2.RequestHandler):
     try:
       commits = getCommits(repo, owner, max_commits)
       template = JINJA_ENVIRONMENT.get_template("templates/graph.html")
-      template_vars = {"commits": json.dumps(commits[:max_commits])}
+      template_vars = {
+        "commits": json.dumps(commits[:max_commits]),
+        "repo": repo,
+        "owner": owner
+      }
       self.response.write(template.render(template_vars))
     except:
       self.response.write("Invalid repository")

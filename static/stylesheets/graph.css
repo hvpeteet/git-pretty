@@ -1,20 +1,51 @@
 #graph {
-  width: 60vw;
+  width: 110vw;
   height: 100vh;
   margin-left: -5vw;
-  margin-top: -5vh;
-  margin-bottom: -5vh;
   overflow: hidden;
   float: left;
 }
+
 #inspector {
-  padding: 10px;
-  width: 40vw;
-  height: 97vh;
-  margin-right: -5vw;
-  background-color: #DDD;
-  float: left;
+  margin-top: 2vh;
+  width: 400px;
+  position: absolute;
+  right: 2vw;
 }
+
 body {
+  overflow: hidden;
+  background-color: #EEE;
+}
+
+.bold {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.dark {
+  color: #333;
+}
+
+.commit-card {
+  width: 100%;
+}
+
+.commit-info {
+  margin: 10px;
+}
+
+.page-content {
+  overflow: hidden;
+  height: 100%;
+}
+
+.main-page {
+  overflow: hidden;
+  height: 100%;
+}
+
+.mdl-layout__content{
+  height: 100%;
   overflow: hidden;
 }
